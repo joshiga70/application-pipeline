@@ -72,7 +72,9 @@ jobs:
       - name: Create new kubernetes cluster on AWS 
         run: |
           aws eks create-cluster  --name ${{env.CLUSTER_NAME}} --role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/EKS-role-pipeline   --resources-vpc-config subnetIds=subnet-0007609ae4b181886,subnet-0d5f88e40b51bfef1,securityGroupIds="sg-0404865abc19be094",endpointPublicAccess=true,endpointPrivateAccess=false --tags createdFor=Demo,ownedBy=Girija
-
+      - name: Wait for cluster initialization
+        run: |
+         sleep 300
       - name: Create new node group for cluster 
         run: |
           aws eks create-nodegroup --cluster-name ${{env.CLUSTER_NAME}} --nodegroup-name demo-eks-nodes --subnets subnet-0007609ae4b181886 subnet-0d5f88e40b51bfef1 --node-role arn:aws:iam::${AWS_ACCOUNT_ID}:role/EKS-Node-Role --instance-type t3.medium --disk-size 20 --scaling-config minSize=3,maxSize=5,desiredSize=3 --tags createdFor=Demo,ownedBy=Girija

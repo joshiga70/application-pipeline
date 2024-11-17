@@ -68,17 +68,35 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # check if the cluster already exists
+      - name: Check if EKS cluster exists
+        id: check-cluster
+        run: |
+         if aws eks describe-cluster --name ${{env.CLUSTER_NAME}} --region $AWS_REGION; then
+           echo "Cluster already exists."
+           echo "exists=true" >> $GITHUB_ENV
+         else
+           echo "Cluster does not exist."
+           echo "exists=false" >> $GITHUB_ENV
+         fi
+
        # Create new kubernetes cluster on AWS
-      - name: Create new kubernetes cluster on AWS 
+      - name: Create new kubernetes cluster on AWS
+        if: env.exists == 'false'
         run: |
           aws eks create-cluster  --name ${{env.CLUSTER_NAME}} --role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/EKS-role-pipeline   --resources-vpc-config subnetIds=subnet-0007609ae4b181886,subnet-0d5f88e40b51bfef1,securityGroupIds="sg-0404865abc19be094",endpointPublicAccess=true,endpointPrivateAccess=false --tags createdFor=Demo,ownedBy=Girija
       - name: Wait for cluster initialization
+        if: env.exists == 'false'
         run: |
          sleep 500
       - name: Create new node group for cluster 
+        if: env.exists == 'false'
         run: |
           aws eks create-nodegroup --cluster-name ${{env.CLUSTER_NAME}} --nodegroup-name demo-eks-nodes --subnets subnet-0007609ae4b181886 subnet-0d5f88e40b51bfef1 --node-role arn:aws:iam::${AWS_ACCOUNT_ID}:role/EKS-Node-Role --instance-type t3.medium --disk-size 20 --scaling-config minSize=3,maxSize=5,desiredSize=3 --tags createdFor=Demo,ownedBy=Girija
-
+    
+      - name: Cluster already exists message
+        if: env.exists == 'true'
+        run: echo "Skipping cluster creation as it already exists."
 
   deploy:
     runs-on: ubuntu-latest
@@ -87,6 +105,14 @@ jobs:
       # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       # Set up kubeconfig
       #- name: Set up kubeconfig

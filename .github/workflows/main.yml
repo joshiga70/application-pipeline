@@ -1,0 +1,101 @@
+name: CI/CD Pipeline for Cloud-Native Application
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY_NAME: ${{ secrets.ECR_REPOSITORY_NAME }}
+  CLUSTER_NAME: demo-eks-cluster
+  DOCKER_IMAGE_NAME: webapp
+  HELM_CHART_PATH: ./helmdeployment
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Login to ECR
+      - name: Login to AWS ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      # Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t $DOCKER_IMAGE_NAME ./webapp
+
+      # Create ECR repository (if not exists)
+      - name: Create ECR repository
+        run: |
+          aws ecr describe-repositories --repository-names $ECR_REPOSITORY_NAME || \
+          aws ecr create-repository --repository-name $ECR_REPOSITORY_NAME
+
+      # Tag and push Docker image to ECR
+      - name: Tag and Push Docker image to ECR
+        run: |
+          IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:latest
+          docker tag $DOCKER_IMAGE_NAME:latest $IMAGE_URI
+          docker push $IMAGE_URI
+
+  create-cluster:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+       # Create new kubernetes cluster on AWS
+      - name: Create new kubernetes cluster on AWS 
+        run: |
+          aws eks create-cluster  --name ${{env.CLUSTER_NAME}} --role-arn arn:aws:iam::${AWS_ACCOUNT_ID}:role/EKS-role-pipeline   --resources-vpc-config subnetIds=subnet-0007609ae4b181886,subnet-0d5f88e40b51bfef1,securityGroupIds="sg-0404865abc19be094",endpointPublicAccess=true,endpointPrivateAccess=false --tags createdFor=Demo,ownedBy=Girija 
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: create-cluster
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up kubeconfig
+      #- name: Set up kubeconfig
+       # run: |
+       #   echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > ~/.kube/config
+
+      # Add Helm repository and update
+      - name: Set up Helm
+        run: helm repo add stable https://charts.helm.sh/stable && helm repo update
+
+      # Deploy application using Helm charts
+      - name: Helm deployment
+        run: |
+          IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:latest
+          helm install hawk-redtail . --create-namespace --namespace project
+      # Verify deployment
+      - name: Verify deployment
+        run: kubectl get all -n project

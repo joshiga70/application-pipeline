@@ -1,0 +1,33 @@
+# Global image settings
+image:
+  repository: "533266954354.dkr.ecr.eu-north-1.amazonaws.com/demo-ecr"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+# Zookeeper settings
+zookeeper:
+  replicaCount: 1
+  image: "zookeeper:3.6"
+  service:
+    name: zookeeper
+    type: ClusterIP
+    port: 2181
+
+# Kafka settings
+kafka:
+  replicaCount: 1
+  image: "bitnami/kafka:latest"
+  service:
+    name: "kafka"
+    port: 9092
+  advertisedHost: "kafka-service"  # Change this to match your service name
+  advertisedPort: 9092
+
+# Web App settings
+webapp:
+  replicaCount: 1
+  image: "533266954354.dkr.ecr.eu-north-1.amazonaws.com/demo-ecr:latest"
+  service:
+    type: LoadBalancer
+    port: 8080
+    targetPort: 8080

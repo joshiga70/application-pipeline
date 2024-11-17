@@ -1,0 +1,5 @@
+apiVersion: v2
+name: application-pipeline
+description: A Helm chart for deploying Zookeeper, Kafka, and Web App microservices
+version: 0.1.0
+appVersion: "1.0"

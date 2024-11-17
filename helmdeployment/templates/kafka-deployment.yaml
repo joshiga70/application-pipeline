@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+spec:
+  replicas: {{ .Values.kafka.replicaCount }}
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: {{ .Values.kafka.image }}
+          env:
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "{{ .Values.zookeeper.service.name }}:{{ .Values.zookeeper.service.port }}"
+            - name: KAFKA_LISTENERS
+              value: "PLAINTEXT://:{{ .Values.kafka.service.port }}"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://{{ .Values.kafka.advertisedHost }}:{{ .Values.kafka.advertisedPort }}"
+          ports:
+            - containerPort: {{ .Values.kafka.service.port }}

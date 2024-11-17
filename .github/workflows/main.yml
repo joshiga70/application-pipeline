@@ -11,6 +11,7 @@ env:
   CLUSTER_NAME: demo-eks-cluster
   DOCKER_IMAGE_NAME: webapp
   HELM_CHART_PATH: ./helmdeployment
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
 jobs:
   build:

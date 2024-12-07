@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pod Status</title>
+  <style>
+    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #ecf0f1; color: #2c3e50; }
+    pre { white-space: pre-wrap; font-family: 'Courier New', Courier, monospace; }
+  </style>
+</head>
+<body>
+  <h1>Pod Status</h1>
+  <div id="output">Loading...</div>
+
+  <script>
+    fetch('/api/pod-status')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('output').innerHTML = data;
+      })
+      .catch(error => {
+        document.getElementById('output').innerHTML = 'Error fetching data: ' + error;
+      });
+  </script>
+</body>
+</html>

@@ -5,9 +5,9 @@ metadata:
   name: webapp-service
 spec:
   selector:
-    app: monitoring-app
+    app: webapp
   ports:
     - protocol: TCP
       port: 8080       # Service port
       targetPort: 8080 # Container port
-  type: NodePort       # Optional: Use LoadBalancer or ClusterIP as needed
+  type: loadbalancer       

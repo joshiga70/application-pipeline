@@ -4,7 +4,7 @@ metadata:
   name: web-service
 spec:
   selector:
-    app: web-app
+    app: webapp
   ports:
     - protocol: TCP
       port: 8080       # Port exposed by the LoadBalancer

@@ -1,13 +1,12 @@
-# templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp-service
+  name: web-service
 spec:
   selector:
-    app: webapp
+    app: monitoring-app
   ports:
     - protocol: TCP
-      port: 8080       # Service port
-      targetPort: 8080 # Container port
-  type: loadbalancer       
+      port: 8080       # Port exposed by the LoadBalancer
+      targetPort: 8080 # Port inside the container
+  type: LoadBalancer   # Expose service as a LoadBalancer

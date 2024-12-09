@@ -140,6 +140,50 @@ jobs:
           kubectl get all -n project
           sleep 200
           kubectl get all -n project
+      # Get the external IP of the service 
+      - name: Extract Web App External IP
+        id: extract-ip
+        run: |
+          
+          WEBAPP_IP=$(kubectl get svc web-service -n project -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          echo "Webapp IP: $WEBAPP_IP"
+          echo "WEBAPP_LINK=http://$WEBAPP_IP:8080" >> $GITHUB_ENV
+
+  test:
+    name: Cypress Test
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm install cypress --save-dev
+
+      - name: Run Cypress Tests
+        env:
+          WEBAPP_URL: ${{ env.WEBAPP_LINK }}
+        run: |
+          echo "Running Cypress tests on $WEBAPP_URL"
+          npx cypress run --env WEBAPP_URL=$WEBAPP_URL
+
+          
+      - name: Archive Cypress Reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-reports
+          path: |
+            cypress/videos
+            cypress/screenshots
+            reports
           
           
             

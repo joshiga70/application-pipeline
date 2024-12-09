@@ -135,4 +135,10 @@ jobs:
           helm install helmdeployment . --create-namespace --namespace project
       # Verify deployment
       - name: Verify deployment
-        run: kubectl get all -n project
+        run: |
+          kubectl get all -n project
+          sleep 200
+          kubectl get all -n project
+          
+          
+            

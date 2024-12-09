@@ -1,9 +1,12 @@
 FROM node:18
 
 WORKDIR /app
+RUN node --version
+RUN npm --version
 
 COPY package*.json ./
 RUN npm install
+
 
 COPY . .
 

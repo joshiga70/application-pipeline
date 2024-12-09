@@ -1,24 +1,25 @@
 const express = require('express');
 const { exec } = require('child_process');
-const app = express();
-const port = 8080;
+const path = require('path');
 
-// Endpoint to fetch kubectl data
-app.get('/api/pod-status', (req, res) => {
-  exec('kubectl get all -n project', (error, stdout, stderr) => {
-    if (error) {
-      return res.status(500).send(`Error: ${error.message}`);
-    }
-    if (stderr) {
-      return res.status(500).send(`Stderr: ${stderr}`);
-    }
-    res.send(`<pre>${stdout}</pre>`); // Sends formatted output
-  });
+const app = express();
+const PORT = 8080;
+
+// Serve the static UI files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Route to display pod status (runs 'kubectl get all -n project')
+app.get('/pod-status', (req, res) => {
+    exec('kubectl get all -n project', (err, stdout, stderr) => {
+        if (err) {
+            console.error('Error executing command:', err);
+            return res.status(500).send(`<pre>Error: ${stderr}</pre>`);
+        }
+        res.send(`<pre>${stdout}</pre>`);
+    });
 });
 
-// Serve static frontend files
-app.use(express.static('public'));
-
-app.listen(port, () => {
-  console.log(`Server running at http://<your-ip>:${port}`);
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

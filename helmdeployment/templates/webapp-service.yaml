@@ -1,15 +1,13 @@
+# templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp
-  labels:
-    app: webapp
+  name: {{ .Release.Name }}-service
 spec:
-  type: LoadBalancer
-  ports:
-    - name: http
-      port: 8080               # Port on the load balancer
-      targetPort: 8080  # Port your web app is listening on inside the pod (e.g., 8080)
-      protocol: TCP
   selector:
-    app: webapp               # Ensure this matches the label of your web app pod
+    app: monitoring-app
+  ports:
+    - protocol: TCP
+      port: 8080       # Service port
+      targetPort: 8080 # Container port
+  type: NodePort       # Optional: Use LoadBalancer or ClusterIP as needed

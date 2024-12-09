@@ -132,7 +132,7 @@ jobs:
         run: |
           cd helmdeployment
           IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:latest
-          helm uninstall helmdeployment 
+          helm uninstall helmdeployment -n project 
           helm install helmdeployment . --create-namespace --namespace project
       # Verify deployment
       - name: Verify deployment

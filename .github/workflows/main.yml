@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_REGION: eu-north-1
   ECR_REPOSITORY_NAME: ${{ secrets.ECR_REPOSITORY_NAME }}
   CLUSTER_NAME: demo-eks-cluster
   DOCKER_IMAGE_NAME: webapp

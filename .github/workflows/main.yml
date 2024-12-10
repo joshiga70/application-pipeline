@@ -193,7 +193,7 @@ jobs:
         run: |
           echo $WEBAPP_LINK
           cd cypress-ui-testsuite
-          jq '.env.url = "$WEBAPP_LINK"' cypress.json > tmp.json && mv tmp.json cypress.json
+          jq '.env.url = $WEBAPP_LINK' cypress.json > tmp.json && mv tmp.json cypress.json
           echo "Updated cypress.json:"
           cat cypress.json
           sh executor.sh 

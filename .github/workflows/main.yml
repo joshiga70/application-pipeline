@@ -167,9 +167,7 @@ jobs:
             echo "WEBAPP_LINK=http://$LOADBALANCER_INGRESS:8080" >> $GITHUB_ENV
           else
             echo "Error: LoadBalancer Ingress value not found."
-=======
-          echo "Waiting for the External IP of the service to become available..."
-            exit 1
+          
           fi
         shell: bash
       # printing webapp link variable

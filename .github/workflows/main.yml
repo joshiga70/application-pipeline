@@ -170,22 +170,12 @@ jobs:
           
           fi
         shell: bash
+
       # printing webapp link variable
       - name: Print WebApp Link
         run: |
           echo "WebApp Link is: $WEBAPP_LINK"
         shell: bash
-
-
-         
-
-  test:
-    name: Cypress Test
-    runs-on: ubuntu-latest
-    needs: deploy
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
 
       - name: Install Node.js
         uses: actions/setup-node@v3
@@ -199,16 +189,15 @@ jobs:
           
 
       - name: Run Cypress Tests
-        env:
-          WEBAPP_URL: ${{ env.WEBAPP_LINK }}
+        
         run: |
-          echo ${{ env.WEBAPP_LINK }}
+          echo $WEBAPP_LINK
           cd cypress-ui-testsuite
-          jq '.env.url = "${{ env.WEBAPP_LINK }}"' cypress.json > tmp.json && mv tmp.json cypress.json
+          jq '.env.url = "$WEBAPP_LINK"' cypress.json > tmp.json && mv tmp.json cypress.json
           echo "Updated cypress.json:"
           cat cypress.json
           sh executor.sh 
-          echo "Running Cypress tests on ${{ env.WEBAPP_LINK }}"
+          echo "Running Cypress tests on $WEBAPP_LINK"
 
 
       - name: Archive Cypress Reports

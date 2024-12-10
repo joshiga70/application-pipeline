@@ -144,10 +144,24 @@ jobs:
       - name: Extract Web App External IP
         id: extract-ip
         run: |
-          
-          WEBAPP_IP=$(kubectl get svc web-service -n project -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-          echo "Webapp IP: $WEBAPP_IP"
-          echo "WEBAPP_LINK=http://$WEBAPP_IP:8080" >> $GITHUB_ENV
+          echo "Waiting for the External IP of the service to become available..."
+          for i in {1..10}; do
+            WEBAPP_IP=$(kubectl get svc webapp-service -n project -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            if [ -n "$WEBAPP_IP" ]; then
+              echo "External IP found: $WEBAPP_IP"
+              echo "WEBAPP_LINK=http://$WEBAPP_IP:8080" >> $GITHUB_ENV
+              break
+            else
+              echo "External IP not yet available. Retrying in 10 seconds..."
+              sleep 10
+            fi
+          done
+          if [ -z "$WEBAPP_IP" ]; then
+            echo "Error: Failed to retrieve the external IP for the service."
+            exit 1
+          fi
+
+         
 
   test:
     name: Cypress Test

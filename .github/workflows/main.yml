@@ -138,28 +138,45 @@ jobs:
       - name: Verify deployment
         run: |
           kubectl get all -n project
-          sleep 200
+          sleep 20
           kubectl get all -n project
-      # Get the external IP of the service 
-      - name: Extract Web App External IP
-        id: extract-ip
+
+
+      - name: Capture Service Description
+        if: always()  # Ensures this step runs even if the previous steps fail
         run: |
-          echo "Waiting for the External IP of the service to become available..."
-          for i in {1..10}; do
-            WEBAPP_IP=$(kubectl get svc webapp-service -n project -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-            if [ -n "$WEBAPP_IP" ]; then
-              echo "External IP found: $WEBAPP_IP"
-              echo "WEBAPP_LINK=http://$WEBAPP_IP:8080" >> $GITHUB_ENV
-              break
-            else
-              echo "External IP not yet available. Retrying in 10 seconds..."
-              sleep 10
-            fi
-          done
-          if [ -z "$WEBAPP_IP" ]; then
-            echo "Error: Failed to retrieve the external IP for the service."
+          echo "Capturing kubectl describe svc output..."
+          kubectl describe svc web-service -n project > webapp-service-description.txt
+        shell: bash
+        
+        - name: Upload Service Description as Artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: webapp-service-description
+            path: webapp-service-description.txt
+
+
+      # Get the external IP of the service 
+      - name: Extract LoadBalancer Ingress Value
+        id: extract-lb-ingress
+        run: |
+          echo "Extracting LoadBalancer Ingress value from service description..."
+          LOADBALANCER_INGRESS=$(grep -i "LoadBalancer Ingress" webapp-service-description.txt | awk '{print $3}')
+
+          if [ -n "$LOADBALANCER_INGRESS" ]; then
+            echo "LoadBalancer Ingress found: $LOADBALANCER_INGRESS"
+            echo "WEBAPP_LINK=http://$LOADBALANCER_INGRESS:8080" >> $GITHUB_ENV
+          else
+            echo "Error: LoadBalancer Ingress value not found."
             exit 1
           fi
+        shell: bash
+
+      - name: Debug WebApp Link
+        run: |
+          echo "WebApp Link is: $WEBAPP_LINK"
+        shell: bash
+
 
          
 

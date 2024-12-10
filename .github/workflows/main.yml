@@ -145,16 +145,15 @@ jobs:
       - name: Capture Service Description
         if: always()  # Ensures this step runs even if the previous steps fail
         run: |
-<<<<<<< HEAD
           echo "Capturing kubectl describe svc output..."
           kubectl describe svc web-service -n project > webapp-service-description.txt
         shell: bash
         
-        - name: Upload Service Description as Artifact
-          uses: actions/upload-artifact@v3
-          with:
-            name: webapp-service-description
-            path: webapp-service-description.txt
+      - name: Upload Service Description as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: webapp-service-description
+          path: webapp-service-description.txt
 
 
       # Get the external IP of the service 
@@ -169,7 +168,6 @@ jobs:
             echo "WEBAPP_LINK=http://$LOADBALANCER_INGRESS:8080" >> $GITHUB_ENV
           else
             echo "Error: LoadBalancer Ingress value not found."
-=======
           echo "Waiting for the External IP of the service to become available..."
           for i in {1..10}; do
             WEBAPP_IP=$(kubectl get svc web-service -n project -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
@@ -184,7 +182,6 @@ jobs:
           done
           if [ -z "$WEBAPP_IP" ]; then
             echo "Error: Failed to retrieve the external IP for the service."
->>>>>>> 61709f6cdfcdda59ca58f48b4bf199526be90825
             exit 1
           fi
         shell: bash

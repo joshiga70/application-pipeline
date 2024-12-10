@@ -164,15 +164,17 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          cd cypress-ui-testsuite
           npm install
-          npm install cypress --save-dev
+          
 
       - name: Run Cypress Tests
         env:
           WEBAPP_URL: ${{ env.WEBAPP_LINK }}
         run: |
+          sed -i -r --expression "s@    \"url\": \"http://0.0.0.0:8080/\",@    \"url\": \"http://${{ env.WEBAPP_LINK }}:8080/\",@g" cypress-ui-testsuite/cypress.json
           echo "Running Cypress tests on $WEBAPP_URL"
-          npx cypress run --env WEBAPP_URL=$WEBAPP_URL
+          ./executor.sh
 
 
       - name: Archive Cypress Reports
@@ -183,7 +185,7 @@ jobs:
           path: |
             cypress/videos
             cypress/screenshots
-            reports
+            reports/cucumber-htmlreport.html/index.html
           
           
             

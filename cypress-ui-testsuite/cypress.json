@@ -1,0 +1,19 @@
+{
+  "viewportWidth": 1500,
+  "viewportHeight": 700,
+  "chromeWebSecurity": false,
+  "env": {
+    "url": "http://0.0.0.0:8080/"
+  },
+  "requestTimeout" : 30000,
+  "numTestsKeptInMemory": 0,
+  "responseTimeout" : 50000,
+  "pageLoadTimeout": 100000,
+  "retries": {
+    "runMode": 1,
+    "openMode": 1
+  },
+  "projectId": "41m4in",
+  "defaultCommandTimeout": 4000,
+  "testFiles": "BDD/*.feature"
+}

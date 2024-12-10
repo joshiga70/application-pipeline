@@ -202,13 +202,13 @@ jobs:
         env:
           WEBAPP_URL: ${{ env.WEBAPP_LINK }}
         run: |
-          echo $WEBAPP_URL
+          echo ${{ env.WEBAPP_LINK }}
           cd cypress-ui-testsuite
           jq '.env.url = "${{ env.WEBAPP_LINK }}"' cypress.json > tmp.json && mv tmp.json cypress.json
           echo "Updated cypress.json:"
           cat cypress.json
           sh executor.sh 
-          echo "Running Cypress tests on $WEBAPP_URL"
+          echo "Running Cypress tests on ${{ env.WEBAPP_LINK }}"
 
 
       - name: Archive Cypress Reports

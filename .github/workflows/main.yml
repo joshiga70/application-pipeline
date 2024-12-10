@@ -202,12 +202,12 @@ jobs:
         env:
           WEBAPP_URL: ${{ env.WEBAPP_LINK }}
         run: |
+          echo $WEBAPP_URL
           cd cypress-ui-testsuite
-          sed -i -r --expression "s@    \"url\": \"http://0.0.0.0:8080/\",@    \"url\": \"http://$WEBAPP_URL:8080/\",@g" cypress-ui-testsuite/cypress.json
-          
-          cd cypress-ui-testsuite
-          ./executor.sh
-          
+          jq '.env.url = "${{ env.WEBAPP_LINK }}"' cypress.json > tmp.json && mv tmp.json cypress.json
+          echo "Updated cypress.json:"
+          cat cypress.json
+          sh executor.sh 
           echo "Running Cypress tests on $WEBAPP_URL"
 
 

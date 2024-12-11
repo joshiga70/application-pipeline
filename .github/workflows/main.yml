@@ -207,7 +207,7 @@ jobs:
         with:
           name: cypress-reports
           path: |
-            cypress/videos
-            cypress/screenshots          
+            /cypress-ui-testsuite/cypress/videos/Monitoring.js.mp4                    
+                      
           
             

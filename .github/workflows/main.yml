@@ -12,7 +12,7 @@ env:
   DOCKER_IMAGE_NAME: webapp
   HELM_CHART_PATH: ./helmdeployment
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  WEBAPP_LINK : $WEBAPP_LINK
+  #WEBAPP_LINK : $WEBAPP_LINK
 
 jobs:
   build:
@@ -191,9 +191,9 @@ jobs:
 
       - name: Run Cypress Tests
         env: 
-           WEBAPP_LINK : $WEBAPP_LINK
+           WEBAPP_LINK : ${{ env.WEBAPP_LINK }}
         run: |
-          echo $WEBAPP_LINK
+          echo "$WEBAPP_LINK"
           cd cypress-ui-testsuite
           jq '.env.url = "${{ env.WEBAPP_LINK }}"' cypress.json > tmp.json && mv tmp.json cypress.json
           echo "Updated cypress.json:"

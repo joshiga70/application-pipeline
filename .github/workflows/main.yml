@@ -187,7 +187,7 @@ jobs:
         run: |
           cd cypress-ui-testsuite
           npm install
-          
+                    
       - name: Run Cypress Tests
         env: 
            WEBAPP_LINK : ${{ env.WEBAPP_LINK }}
@@ -198,8 +198,6 @@ jobs:
           echo "Updated cypress.json:"
           cat cypress.json
           npm run node_modules/.bin/cypress run -- -e --browser electron --spec "cypress/integration/BDD/Monitoring.feature"
-
-        # sh executor.sh 
           echo "Running Cypress tests on ${{ env.WEBAPP_LINK }}"
 
 

@@ -12,8 +12,6 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
-require('cypress-xpath')
-require('cypress-plugin-tab')
 // Import commands.js using ES2015 syntax:
 import './commands'
 import "cypress-real-events/support"

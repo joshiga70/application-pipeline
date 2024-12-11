@@ -9,11 +9,6 @@
   "numTestsKeptInMemory": 0,
   "responseTimeout" : 50000,
   "pageLoadTimeout": 100000,
-  "retries": {
-    "runMode": 1,
-    "openMode": 1
-  },
   "projectId": "41m4in",
-  "defaultCommandTimeout": 4000,
-  "testFiles": "BDD/*.feature"
+  "defaultCommandTimeout": 4000
 }

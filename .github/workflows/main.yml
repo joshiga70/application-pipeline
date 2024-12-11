@@ -197,7 +197,7 @@ jobs:
           jq '.env.url = "${{ env.WEBAPP_LINK }}"' cypress.json > tmp.json && mv tmp.json cypress.json
           echo "Updated cypress.json:"
           cat cypress.json
-          node_modules/.bin/cypress run -- -e --browser electron --spec "cypress/integration/BDD/Monitoring.feature"
+          node_modules/.bin/cypress run -- --reporter mochawesome
           echo "Running Cypress tests on ${{ env.WEBAPP_LINK }}"
 
 
@@ -208,8 +208,6 @@ jobs:
           name: cypress-reports
           path: |
             cypress/videos
-            cypress/screenshots
-            reports/cucumber-htmlreport.html/index.html
-          
+            cypress/screenshots          
           
             
